@@ -3,17 +3,19 @@
  * Created by ypling on 10/24/16.
  */
 import {buildSchema} from 'graphql';
-import customers from '../query/customers';
+import viewer from '../query/viewer';
+import {createCustomer, removeCustomer} from '../mutation/customers';
 
 export const schema = buildSchema(`
   type Query {
-    customers: [Customer]
+    viewer(token: String): User
   }
   
   # some description
   type User {
-    username(id:Int): String
-    password: String
+    id: ID!
+    username: String
+    customers(ids: [ID]): [Customer]
   }
   
   # represent to a customer
@@ -21,12 +23,24 @@ export const schema = buildSchema(`
     id: ID!
     weiChatId: String
     weiChatName: String
-    #customer ID
-    refered: ID
+    refered: [ID]
+    referBy: ID
+  }
+  
+  type Mutation {
+    createCustomer(input: CustomerInput!): Customer
+    removeCustomer(id: ID!): ID
+  }
+  
+  input CustomerInput {
+    weiChatId: String
+    weiChatName: String
     referBy: ID
   }
 `);
 
 export const root = {
-  customers
+  viewer,
+  createCustomer,
+  removeCustomer
 };
